@@ -54,5 +54,5 @@ else()
 		${IQA_SOURCES}
         ${BIMG_SOURCES}
     )
-    set(BGFX_INCLUDE_DIRS ${BGFX_INCLUDE_DIRS} ${BIMG_DIR}/include ${BIMG_DIR}/3rdparty )
+    set(BGFX_INCLUDE_DIRS ${BGFX_INCLUDE_DIRS} ${BIMG_DIR}/include ${BIMG_DIR}/3rdparty ${BIMG_DIR}/3rdparty/iqa/include )
 endif()
