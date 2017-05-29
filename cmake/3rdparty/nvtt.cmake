@@ -26,8 +26,13 @@ file(
 	${BIMG_DIR}/3rdparty/nvtt/*.cpp
 	${BIMG_DIR}/3rdparty/nvtt/*.h
 )
+source_group("bgfx/3rdparty/nvtt" FILES ${NVTT_SOURCES})
 
-add_library( nvtt STATIC ${NVTT_SOURCES} )
-target_include_directories( nvtt PUBLIC ${BIMG_DIR}/3rdparty ${BIMG_DIR}/3rdparty/nvtt )
-set_target_properties( nvtt PROPERTIES FOLDER "bgfx/3rdparty" )
-target_link_libraries( nvtt PUBLIC bx )
+if (NOT BGFX_BUILTIN)
+    add_library( nvtt STATIC ${NVTT_SOURCES} )
+    target_include_directories( nvtt PUBLIC ${BIMG_DIR}/3rdparty ${BIMG_DIR}/3rdparty/nvtt )
+    set_target_properties( nvtt PROPERTIES FOLDER "bgfx/3rdparty" )
+    target_link_libraries( nvtt PUBLIC bx )
+else()
+    set(BGFX_INCLUDE_DIRS ${BGFX_INCLUDE_DIRS} ${BIMG_DIR}/3rdparty ${BIMG_DIR}/3rdparty/nvtt )
+endif()

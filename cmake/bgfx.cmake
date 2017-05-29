@@ -26,42 +26,68 @@ else()
 	set_source_files_properties( ${BGFX_DIR}/src/amalgamated.cpp PROPERTIES HEADER_FILE_ONLY ON )
 endif()
 
-# Create the bgfx target
-add_library( bgfx STATIC ${BGFX_SOURCES} )
+source_group("bgfx/bgfx" FILES ${BGFX_SOURCES})
 
-# Enable BGFX_CONFIG_DEBUG in Debug configuration
-target_compile_definitions( bgfx PRIVATE "$<$<CONFIG:Debug>:BGFX_CONFIG_DEBUG=1>" )
+if (NOT BGFX_BUILTIN)
+    # Create the bgfx target
+    add_library( bgfx STATIC ${BGFX_SOURCES} )
 
-# Special Visual Studio Flags
-if( MSVC )
-	target_compile_definitions( bgfx PRIVATE "_CRT_SECURE_NO_WARNINGS" )
-endif()
+    # Enable BGFX_CONFIG_DEBUG in Debug configuration
+    target_compile_definitions( bgfx PRIVATE "$<$<CONFIG:Debug>:BGFX_CONFIG_DEBUG=1>" )
 
-# Includes
-target_include_directories( bgfx PRIVATE ${BGFX_DIR}/3rdparty ${BGFX_DIR}/3rdparty/dxsdk/include ${BGFX_DIR}/3rdparty/khronos )
-target_include_directories( bgfx PUBLIC ${BGFX_DIR}/include )
+    # Special Visual Studio Flags
+    if( MSVC )
+        target_compile_definitions( bgfx PRIVATE "_CRT_SECURE_NO_WARNINGS" )
+    endif()
 
-# bgfx depends on bx and bimg
-target_link_libraries( bgfx PUBLIC bx bimg )
+    # Includes
+    target_include_directories( bgfx PRIVATE ${BGFX_DIR}/3rdparty ${BGFX_DIR}/3rdparty/dxsdk/include ${BGFX_DIR}/3rdparty/khronos )
+    target_include_directories( bgfx PUBLIC ${BGFX_DIR}/include )
+    
+    # bgfx depends on bx and bimg
+    target_link_libraries( bgfx PUBLIC bx bimg )
 
-# ovr support
-if( BGFX_USE_OVR )
-	target_link_libraries( bgfx PUBLIC ovr )
-endif()
+    # ovr support
+    if( BGFX_USE_OVR )
+        target_link_libraries( bgfx PUBLIC ovr )
+    endif()
 
-# Frameworks required on OS X
-if( APPLE )
-	find_library( COCOA_LIBRARY Cocoa )
-	find_library( METAL_LIBRARY Metal )
-	find_library( QUARTZCORE_LIBRARY QuartzCore )
-	mark_as_advanced( COCOA_LIBRARY )
-	mark_as_advanced( METAL_LIBRARY )
-	mark_as_advanced( QUARTZCORE_LIBRARY )
-	target_link_libraries( bgfx PUBLIC ${COCOA_LIBRARY} ${METAL_LIBRARY} ${QUARTZCORE_LIBRARY} )
-endif()
+    # Frameworks required on OS X
+    if( APPLE )
+        find_library( COCOA_LIBRARY Cocoa )
+        find_library( METAL_LIBRARY Metal )
+        find_library( QUARTZCORE_LIBRARY QuartzCore )
+        mark_as_advanced( COCOA_LIBRARY )
+        mark_as_advanced( METAL_LIBRARY )
+        mark_as_advanced( QUARTZCORE_LIBRARY )
+        target_link_libraries( bgfx PUBLIC ${COCOA_LIBRARY} ${METAL_LIBRARY} ${QUARTZCORE_LIBRARY} )
+    endif()
 
-if( UNIX AND NOT APPLE )
-	target_link_libraries( bgfx PUBLIC GL )
+    if( UNIX AND NOT APPLE )
+        target_link_libraries( bgfx PUBLIC GL )
+    endif()
+
+	# Put in a "bgfx" folder in Visual Studio
+	set_target_properties( bgfx PROPERTIES FOLDER "bgfx" )
+
+	# Export debug build as "bgfxd"
+	set_target_properties( bgfx PROPERTIES OUTPUT_NAME_DEBUG "bgfxd" )
+else()
+    if( APPLE )
+        find_library( COCOA_LIBRARY Cocoa )
+        find_library( METAL_LIBRARY Metal )
+        find_library( QUARTZCORE_LIBRARY QuartzCore )
+        mark_as_advanced( COCOA_LIBRARY )
+        mark_as_advanced( METAL_LIBRARY )
+        mark_as_advanced( QUARTZCORE_LIBRARY )
+        set(BGFX_LIBRARIES ${BGFX_LIBRARIES} ${COCOA_LIBRARY} ${METAL_LIBRARY} ${QUARTZCORE_LIBRARY )
+    endif()
+
+    if( UNIX AND NOT APPLE )
+        set(BGFX_LIBRARIES ${BGFX_LIBRARIES} GL )
+    endif()
+
+    set(BGFX_INCLUDE_DIRS ${BGFX_INCLUDE_DIRS} ${BGFX_DIR}/3rdparty ${BGFX_DIR}/3rdparty/dxsdk/include ${BGFX_DIR}/3rdparty/khronos ${BGFX_DIR}/include )
 endif()
 
 # Excluded files from compilation
@@ -80,9 +106,3 @@ endif()
 if( NOT UNIX OR APPLE )
 	set_source_files_properties( ${BGFX_DIR}/src/glcontext_glx.cpp PROPERTIES HEADER_FILE_ONLY ON )
 endif()
-
-# Put in a "bgfx" folder in Visual Studio
-set_target_properties( bgfx PROPERTIES FOLDER "bgfx" )
-
-# Export debug build as "bgfxd"
-set_target_properties( bgfx PROPERTIES OUTPUT_NAME_DEBUG "bgfxd" )

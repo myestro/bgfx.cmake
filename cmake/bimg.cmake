@@ -9,13 +9,13 @@
 # this software. If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
 
 # Third party libs
-include( cmake/3rdparty/edtaa3.cmake )
-include( cmake/3rdparty/etc1.cmake )
-include( cmake/3rdparty/etc2.cmake )
-include( cmake/3rdparty/iqa.cmake )
-include( cmake/3rdparty/libsquish.cmake )
-include( cmake/3rdparty/nvtt.cmake )
-include( cmake/3rdparty/pvrtc.cmake )
+include("${BGFX_ROOT}cmake/3rdparty/edtaa3.cmake")
+include("${BGFX_ROOT}cmake/3rdparty/etc1.cmake")
+include("${BGFX_ROOT}cmake/3rdparty/etc2.cmake")
+include("${BGFX_ROOT}cmake/3rdparty/iqa.cmake")
+include("${BGFX_ROOT}cmake/3rdparty/libsquish.cmake")
+include("${BGFX_ROOT}cmake/3rdparty/nvtt.cmake")
+include("${BGFX_ROOT}cmake/3rdparty/pvrtc.cmake")
 
 # Ensure the directory exists
 if( NOT IS_DIRECTORY ${BIMG_DIR} )
@@ -26,17 +26,33 @@ endif()
 # Grab the bimg source files
 file( GLOB BIMG_SOURCES ${BIMG_DIR}/src/*.cpp )
 
-# Create the bimg target
-add_library( bimg STATIC ${BIMG_SOURCES} )
+source_group("bgfx/bimg" FILES ${BIMG_SOURCES})
 
-# Add include directory of bimg
-target_include_directories( bimg PUBLIC ${BIMG_DIR}/include )
+if (NOT BGFX_BUILTIN)
+    # Create the bimg target
+    add_library( bimg STATIC ${BIMG_SOURCES} )
 
-# bimg dependencies
-target_link_libraries( bimg bx edtaa3 etc1 etc2 iqa squish nvtt pvrtc )
+    # Add include directory of bimg
+    target_include_directories( bimg PUBLIC ${BIMG_DIR}/include )
 
-# Put in a "bgfx" folder in Visual Studio
-set_target_properties( bimg PROPERTIES FOLDER "bgfx" )
+    # bimg dependencies
+    target_link_libraries( bimg bx edtaa3 etc1 etc2 iqa squish nvtt pvrtc )
 
-# Export debug build as "bimgd"
-set_target_properties( bimg PROPERTIES OUTPUT_NAME_DEBUG "bimgd" )
+    # Put in a "bgfx" folder in Visual Studio
+    set_target_properties( bimg PROPERTIES FOLDER "bgfx" )
+
+	# Export debug build as "bimgd"
+	set_target_properties( bimg PROPERTIES OUTPUT_NAME_DEBUG "bimgd" )
+else()
+    set(BIMG_SOURCES ${BGFX_BUILTIN_SOURCES}
+        ${SQUISH_SOURCES}
+        ${NVTT_SOURCES}
+        ${PVRTC_SOURCES}
+        ${EDTAA3_SOURCES}
+        ${ETC1_SOURCES}
+        ${ETC2_SOURCES}
+		${IQA_SOURCES}
+        ${BIMG_SOURCES}
+    )
+    set(BGFX_INCLUDE_DIRS ${BGFX_INCLUDE_DIRS} ${BIMG_DIR}/include ${BIMG_DIR}/3rdparty )
+endif()
