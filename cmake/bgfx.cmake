@@ -63,9 +63,9 @@ if (NOT BGFX_BUILTIN)
         target_link_libraries( bgfx PUBLIC ${COCOA_LIBRARY} ${METAL_LIBRARY} ${QUARTZCORE_LIBRARY} )
     endif()
 
-    if( UNIX AND NOT APPLE )
-        target_link_libraries( bgfx PUBLIC GL )
-    endif()
+    #if( UNIX AND NOT APPLE )
+    #    target_link_libraries( bgfx PUBLIC GL )
+    #endif()
 
 	# Put in a "bgfx" folder in Visual Studio
 	set_target_properties( bgfx PROPERTIES FOLDER "bgfx" )
@@ -83,9 +83,9 @@ else()
         set(BGFX_LIBRARIES ${BGFX_LIBRARIES} ${COCOA_LIBRARY} ${METAL_LIBRARY} ${QUARTZCORE_LIBRARY )
     endif()
 
-    if( UNIX AND NOT APPLE )
-        set(BGFX_LIBRARIES ${BGFX_LIBRARIES} GL )
-    endif()
+    #if( UNIX AND NOT APPLE )
+    #    set(BGFX_LIBRARIES ${BGFX_LIBRARIES} GL )
+    #endif()
 
     set(BGFX_INCLUDE_DIRS ${BGFX_INCLUDE_DIRS} ${BGFX_DIR}/3rdparty ${BGFX_DIR}/3rdparty/dxsdk/include ${BGFX_DIR}/3rdparty/khronos ${BGFX_DIR}/include )
 endif()
